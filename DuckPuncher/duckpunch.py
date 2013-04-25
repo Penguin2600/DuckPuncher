@@ -6,10 +6,9 @@ import inspect
 class PatchedA():
     def patch_cls(cls, func_name):
         def patch_by_name(new_func):
-            old_func = getattr(cls, func_name)
-
+            orig_func = getattr(cls, func_name)
             def patched_func(self):
-                return new_func(self, old_func)
+                return new_func(self, orig_func)
             setattr(cls, func_name, patched_func)
         return patch_by_name
 
@@ -21,23 +20,15 @@ class PatchedA():
 #Patch an unbound function
 def patch_mod(module, func_name):
     def patch_by_name(new_func):
-        old_func = getattr(module, func_name)
-        old_args = inspect.getargspec(old_func)[0]
-
-        def patched_func(varone, vartwo):
-            return new_func(old_func, varone, vartwo)
+        orig_func = getattr(module, func_name)
+        def patched_func(*args):
+            varPassThru = inspect.getcallargs(orig_func, *args)
+            return new_func(orig_func, varPassThru)
         setattr(module, func_name, patched_func)
     return patch_by_name
 
-
-def functionBuilder(value_to_print):
-    def _function():
-        print value_to_print
-    return _function
-
-
 @patch_mod(someclass, 'a_func')
-def a_func_patched(orig_func, varone, vartwo):
-    b = orig_func(varone, vartwo)
+def a_func(orig_func, varPass):
+    b = orig_func(varPass['varone'], varPass['vartwo'])
     b.valueOne = "waag "
     return b

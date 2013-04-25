@@ -12,4 +12,4 @@ print someclass.a_func("test", 0).print_val()
 print "==Patched=="
 from DuckPuncher import duckpunch
 print A.print_val()
-print someclass.a_func("test", 2).print_val()
+print someclass.a_func("test", 6).print_val()
