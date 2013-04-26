@@ -21,14 +21,14 @@ class PatchedA():
 def patch_mod(module, func_name):
     def patch_by_name(new_func):
         orig_func = getattr(module, func_name)
-        def patched_func(*args):
-            varPassThru = inspect.getcallargs(orig_func, *args)
+        def patched_func(*args, **kwargs):
+            varPassThru = inspect.getcallargs(orig_func, *args, **kwargs)
             return new_func(orig_func, varPassThru)
         setattr(module, func_name, patched_func)
     return patch_by_name
 
 @patch_mod(someclass, 'a_func')
 def a_func(orig_func, varPass):
-    b = orig_func(varPass['varone'], varPass['vartwo'])
+    b = orig_func(**varPass)
     b.valueOne = "waag "
     return b
